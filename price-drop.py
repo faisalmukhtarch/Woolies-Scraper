@@ -79,7 +79,7 @@ def cw_scraper(driver):
     for cwref, cwid in watchlist["Chemist_Warehouse"].items():
         full_link = CW_BASE + cwid
         driver.get(full_link)
-        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div[itemprop='name']")))
+        WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div[itemprop='name']")))
         page_source = driver.page_source
         soup = BeautifulSoup(page_source, "html.parser")
 
@@ -116,7 +116,7 @@ def woolies_scraper(driver):
     for wlref, wlid in watchlist["Woolworths"].items():
         full_link = WOOLIES_BASE + wlid
         driver.get(full_link)
-        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "h1.shelfProductTile-title")))
+        WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.CSS_SELECTOR, "h1.shelfProductTile-title")))
         page_source = driver.page_source
         soup = BeautifulSoup(page_source, "html.parser")
 
