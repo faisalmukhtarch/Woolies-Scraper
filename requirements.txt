@@ -1,4 +1,5 @@
 beautifulsoup4  # Specify the version you're using
 sendgrid
 selenium
+plyer
 # Add any other dependencies your project needs
