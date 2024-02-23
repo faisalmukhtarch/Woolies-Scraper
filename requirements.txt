@@ -1,3 +1,4 @@
 beautifulsoup4  # Specify the version you're using
 sendgrid
+selenium
 # Add any other dependencies your project needs
