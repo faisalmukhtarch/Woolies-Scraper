@@ -1,6 +1,9 @@
 name: Scheduled Script with Email Notification
 
 on:
+  push:
+    branches:
+      - master # default branch
   schedule:
     - cron: '0 8 * * *' # Runs every day at 8 AM UTC
 
