@@ -17,7 +17,15 @@ options.add_argument("--headless")
 options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3")
 driver = webdriver.Firefox(options=options)
 driver.set_window_size(1920, 1080)  # Set window size
+options.headless = False  # For testing locally, set to True in GitHub Actions with a user agent
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
 
+# Wait for a specific element that appears after the JS challenge
+WebDriverWait(driver, 30).until(
+    EC.presence_of_element_located((By.CLASS_NAME, "price-dollars"))
+)
 
 f = open("watchlist.json", "r")
 watchlist = json.load(f)
