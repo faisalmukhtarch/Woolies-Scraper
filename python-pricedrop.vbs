@@ -1,0 +1,1 @@
+CreateObject("Wscript.Shell").Run "pythonw.exe price-drop.py", 0, True
