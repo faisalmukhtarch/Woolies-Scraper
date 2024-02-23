@@ -1,0 +1,3 @@
+beautifulsoup4  # Specify the version you're using
+sendgrid
+# Add any other dependencies your project needs
