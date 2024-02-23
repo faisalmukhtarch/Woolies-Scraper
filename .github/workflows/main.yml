@@ -1,34 +1,33 @@
-name: Scheduled Script with Email Notification
-
-- name: Install dependencies
-  run: |
-    python -m pip install --upgrade pip
-    pip install -r requirements.txt
+name: Scheduled Script Execution with Email Notification
 
 on:
-  push:
-    branches:
-      - master # default branch
   schedule:
-    - cron: '0 8 * * *' # Runs every day at 8 AM UTC
+    - cron: '0 8 * * *' # Runs every day at 8 AM UTC. Adjust according to your needs.
+  push: # Temporary trigger for testing. Remove or comment out when not needed.
+    branches:
+      - master # Adjust this to match your default branch if it's not 'main'.
 
 jobs:
-  run-and-notify:
+  execute-and-notify:
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
+
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: '3.x'
+        python-version: '3.x' # Specify the Python version you need.
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install sendgrid python-dotenv
-    - name: Run script and send email
+        pip install -r requirements.txt
+
+    - name: Run script
+      run: python price-drop.py # Replace with the path to your script.
+
+    - name: Send email notification
       env:
         SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
-      run: |
-        python price-drop.py  # Replace with the path to your script
-        python send_email.py   # This script will send the email using SendGrid
+      run: python send_email.py # Assumes you have this script for sending emails via SendGrid.
