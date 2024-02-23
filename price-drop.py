@@ -100,7 +100,12 @@ def cw_scraper(driver):
         print(driver.page_source)  # This will output the current HTML to the console
         
         # Now attempt to wait for the specific element
-        WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div[itemprop='name']")))
+        try:
+            WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div[itemprop='name']")))
+        except TimeoutException:
+            print("Timeout reached. Current page source:")
+            print(driver.page_source)
+            raise  # Re-throw the exception to avoid proceeding with the rest of the script
         page_source = driver.page_source
         soup = BeautifulSoup(page_source, "html.parser")
 
