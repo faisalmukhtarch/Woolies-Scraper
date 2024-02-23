@@ -10,6 +10,8 @@ from selenium.webdriver.support import expected_conditions as EC
 # from win11toast import toast
 from typing import Dict
 from plyer import notification  # Add this import at the top with other imports
+from selenium.common.exceptions import TimeoutException
+
 
 f = open("watchlist.json", "r")
 watchlist = json.load(f)
@@ -77,10 +79,17 @@ def cw_scraper(driver):
     for cwref, cwid in watchlist["Chemist_Warehouse"].items():
         full_link = CW_BASE + cwid
         driver.get(full_link)
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div[itemprop='name']")))
         page_source = driver.page_source
         soup = BeautifulSoup(page_source, "html.parser")
 
-        product_name = soup.find("div", {"itemprop": "name"}).text.strip()
+        product_name_element = soup.find("div", {"itemprop": "name"})
+        if product_name_element is not None:
+            product_name = product_name_element.text.strip()
+        else:
+            product_name = "Not found"
+            print(f"Product name not found for {cwref}")
+            continue  # Skip this item if the product name is not found
         current_price = soup.find("span", {"class": "product__price"}).text
 
         print(product_name)
@@ -107,11 +116,26 @@ def woolies_scraper(driver):
     for wlref, wlid in watchlist["Woolworths"].items():
         full_link = WOOLIES_BASE + wlid
         driver.get(full_link)
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "h1.shelfProductTile-title")))
         page_source = driver.page_source
         soup = BeautifulSoup(page_source, "html.parser")
 
-        # print(soup.text)
-        product_name = soup.find("h1", {"class": "shelfProductTile-title"}).text
+        product_name_element = soup.find("h1", {"class": "shelfProductTile-title"})
+        if product_name_element is not None:
+            product_name = product_name_element.text
+        else:
+            product_name = "Not found"
+            print(f"Product name not found for {wlref}")
+            continue  # Skip this item if the product name is not found
+        
+        # Ensure that you also wait for price elements before attempting to access them
+        try:
+            current_price_dollars = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "price-dollars"))).text
+            current_price_cents = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "price-cents"))).text
+            # Further processing...
+        except TimeoutException:
+            print(f"Price information not found for {wlref}")
+            continue  # Skip this item if price information is not found
         current_price_dollars = WebDriverWait(driver, WAIT_DELAY).until(EC.presence_of_element_located((By.CLASS_NAME, "price-dollars"))).text
         current_price_cents = WebDriverWait(driver, WAIT_DELAY).until(EC.presence_of_element_located((By.CLASS_NAME, "price-cents"))).text
         # curr_price = f"{current_price_dollars}.{current_price_cents}"

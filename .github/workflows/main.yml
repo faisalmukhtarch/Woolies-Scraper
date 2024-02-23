@@ -24,6 +24,9 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
+    - name: Set up geckodriver
+      uses: webdriverio/setup-geckodriver@v0.33.0
+
     - name: Run script
       run: python price-drop.py # Replace with the path to your script.
 
