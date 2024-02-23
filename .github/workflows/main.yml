@@ -25,10 +25,10 @@ jobs:
         pip install -r requirements.txt
 
     - name: Download geckodriver
-    run: |
-      wget https://github.com/mozilla/geckodriver/releases/download/v0.33.0/geckodriver-v0.33.0-linux64.tar.gz
-      tar -xzf geckodriver-v0.33.0-linux64.tar.gz
-      sudo mv geckodriver /usr/local/bin/
+      run: |
+        wget https://github.com/mozilla/geckodriver/releases/download/v0.33.0/geckodriver-v0.33.0-linux64.tar.gz
+        tar -xzf geckodriver-v0.33.0-linux64.tar.gz
+        sudo mv geckodriver /usr/local/bin/
 
     - name: Run script
       run: python price-drop.py # Replace with the path to your script.
