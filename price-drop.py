@@ -11,6 +11,12 @@ from selenium.webdriver.support import expected_conditions as EC
 from typing import Dict
 from plyer import notification  # Add this import at the top with other imports
 from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.firefox.options import Options
+options = Options()
+options.add_argument("--headless")
+options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3")
+driver = webdriver.Firefox(options=options)
+driver.set_window_size(1920, 1080)  # Set window size
 
 
 f = open("watchlist.json", "r")
@@ -79,6 +85,13 @@ def cw_scraper(driver):
     for cwref, cwid in watchlist["Chemist_Warehouse"].items():
         full_link = CW_BASE + cwid
         driver.get(full_link)
+        # Add a brief explicit wait here to ensure the page has had some time to load
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "body")))
+        
+        # Debug: print the page source to inspect what has been loaded
+        print(driver.page_source)  # This will output the current HTML to the console
+        
+        # Now attempt to wait for the specific element
         WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div[itemprop='name']")))
         page_source = driver.page_source
         soup = BeautifulSoup(page_source, "html.parser")
@@ -116,6 +129,8 @@ def woolies_scraper(driver):
     for wlref, wlid in watchlist["Woolworths"].items():
         full_link = WOOLIES_BASE + wlid
         driver.get(full_link)
+        # Add the line here to print the page source
+        print(driver.page_source)
         WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.CSS_SELECTOR, "h1.shelfProductTile-title")))
         page_source = driver.page_source
         soup = BeautifulSoup(page_source, "html.parser")
