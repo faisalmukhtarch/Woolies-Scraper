@@ -1,39 +1,53 @@
-name: Scheduled Script Execution with Email Notification
+name: PriceWatch — scheduled price check
 
 on:
   schedule:
-    - cron: '0 8 * * *' # Runs every day at 8 AM UTC. Adjust according to your needs.
-  push: # Temporary trigger for testing. Remove or comment out when not needed.
-    branches:
-      - master # Adjust this to match your default branch if it's not 'main'.
+    - cron: '0 8 * * *'   # daily at 8 AM UTC
+  workflow_dispatch: {}    # allow manual runs from the Actions tab
 
 jobs:
-  execute-and-notify:
+  check-prices:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.x' # Specify the Python version you need.
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-    - name: Download geckodriver
-      run: |
-        wget https://github.com/mozilla/geckodriver/releases/download/v0.34.0/geckodriver-v0.34.0-linux64.tar.gz
-        tar -xzf geckodriver-v0.34.0-linux64.tar.gz
-        sudo mv geckodriver /usr/local/bin/
+      - name: Run tests
+        run: python -m pytest -q
 
-    - name: Run script
-      run: python price-drop.py # Replace with the path to your script.
+      # Optional: only needed for the Selenium scrape providers
+      # (Chemist Warehouse has no API). API-only users can drop this step.
+      - name: Set up Firefox + geckodriver
+        uses: browser-actions/setup-firefox@v1
 
-    - name: Send email notification
-      env:
-        SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
-      run: python send_email.py # Assumes you have this script for sending emails via SendGrid.
+      - name: Install geckodriver
+        run: |
+          wget -q https://github.com/mozilla/geckodriver/releases/download/v0.34.0/geckodriver-v0.34.0-linux64.tar.gz
+          tar -xzf geckodriver-v0.34.0-linux64.tar.gz
+          sudo mv geckodriver /usr/local/bin/
+
+      - name: Run price check + email digest
+        env:
+          # API providers activate only when their secret is set; others are skipped.
+          WOOLWORTHS_API_KEY: ${{ secrets.WOOLWORTHS_API_KEY }}
+          AMAZON_BACKEND: ${{ vars.AMAZON_BACKEND }}
+          KEEPA_API_KEY: ${{ secrets.KEEPA_API_KEY }}
+          PAAPI_ACCESS_KEY: ${{ secrets.PAAPI_ACCESS_KEY }}
+          PAAPI_SECRET_KEY: ${{ secrets.PAAPI_SECRET_KEY }}
+          PAAPI_PARTNER_TAG: ${{ secrets.PAAPI_PARTNER_TAG }}
+          COLES_API_KEY: ${{ secrets.COLES_API_KEY }}
+          COLES_API_HOST: ${{ vars.COLES_API_HOST }}
+          SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+          PRICEWATCH_EMAIL_TO: ${{ vars.PRICEWATCH_EMAIL_TO }}
+          PRICEWATCH_DROP_THRESHOLD: ${{ vars.PRICEWATCH_DROP_THRESHOLD }}
+        run: python -m pricewatch --no-desktop

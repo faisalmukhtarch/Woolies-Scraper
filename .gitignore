@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+
+# Node / Selenium driver noise
+node_modules/
+geckodriver.log
+*.log
+
+# OS
+.DS_Store
+
+# Local env / secrets
+.env
