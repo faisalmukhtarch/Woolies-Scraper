@@ -1,5 +1,14 @@
-beautifulsoup4  # Specify the version you're using
-sendgrid
+# Core (always needed)
+requests
+
+# Notifications
+sendgrid          # email digests via SendGrid (optional, needs SENDGRID_API_KEY)
+plyer             # desktop toast notifications (optional)
+
+# Legacy Selenium scrape provider (Chemist Warehouse + Woolworths fallback)
+# Only required if you use the scrape providers; the API providers do not need these.
 selenium
-plyer
-# Add any other dependencies your project needs
+beautifulsoup4
+
+# Testing
+pytest
